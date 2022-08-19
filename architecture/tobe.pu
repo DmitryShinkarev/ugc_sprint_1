@@ -1,0 +1,78 @@
+@startuml
+
+skinparam componentStyle uml2
+
+actor User
+actor Analyst
+actor Admin
+
+
+package "Auth Service" {
+    interface LoadBalancer as nginx3
+    [Flask]
+    database Redis as redis_2
+    database Postgres as postgres_2
+}
+[Flask] <--> redis_2: cache
+[Flask] <--> postgres_2
+nginx3 <--> [Flask]: proxy
+
+package "Admin panel" {
+    database Postgres
+    interface LoadBalancer as nginx
+    [Django]
+}
+[Django] <--> Postgres
+nginx <--> [Django]: proxy
+Admin <.right.> nginx: http
+
+package "ETL Service" {
+    database Elasticsearch
+    database Redis as redis_3
+    [ETL manager]
+}
+Postgres <.. [ETL manager]: extract
+[ETL manager] --> Elasticsearch: load
+[ETL manager] --> redis_3: status
+
+package "Async API" {
+    interface LoadBalancer as nginx2
+    database Redis
+    [FastAPI]
+}
+[FastAPI] <--> Redis: cache
+User <..> nginx2: http
+nginx2 <--> [FastAPI]: proxy
+[FastAPI] ..> Elasticsearch
+[FastAPI] <..> nginx3: http
+
+cloud "OAuth2" {
+    node Yandex
+    node VK
+}
+[Flask] <..> OAuth2
+
+package "UGC Service" {
+    interface LoadBalancer as nginx4
+    database Redis as redis_4
+    database Kafka
+    [UGC API]
+}
+
+package "Database analysis Service" {
+    database ClickHouse
+    [DataAnalysisETL]
+
+}
+
+
+[UGC API] --> Kafka: save
+[UGC API] <--> redis_4: cache
+[DataAnalysisETL] -> Kafka: extract
+[DataAnalysisETL] -left-> ClickHouse: load
+nginx4 <-> [UGC API]: proxy
+User <.up.> nginx4: http/jwt
+Analyst <.up.> ClickHouse
+
+
+@enduml

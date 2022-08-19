@@ -1,0 +1,10 @@
+fastapi==0.70.0
+uvicorn==0.16.0
+pydantic==1.8.2
+orjson==3.6.5
+aiokafka==0.7.2
+httpx==0.21.1
+pyjwt==2.3.0
+py_auth_header_parser==1.0.2
+redis==4.0.2
+python-redis-cache==1.2.0
