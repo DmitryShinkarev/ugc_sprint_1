@@ -3,12 +3,22 @@ from random import choice, randint
 from typing import Optional
 from uuid import UUID, uuid4
 
+import orjson
+from core.settings import get_settings
 from pydantic import BaseModel
 
-from core.settings import get_settings
+
+def orjson_dumps(v, *, default):
+    return orjson.dumps(v, default=default).decode()
 
 
-class Payload(BaseModel):
+class BaseUGCModel(BaseModel):
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
+
+class Payload(BaseUGCModel):
     movie_id: UUID
     user_id: UUID
     event_data: Optional[str]
@@ -22,7 +32,7 @@ class Payload(BaseModel):
         return result
 
 
-class EventForUGS(BaseModel):
+class EventForUGS(BaseUGCModel):
     payload: Payload
     event_type: str
     language: Optional[str]

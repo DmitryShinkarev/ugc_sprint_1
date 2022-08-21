@@ -18,6 +18,7 @@ logger = logging.getLogger("main")
 
 settings = get_settings()
 
+
 @backoff
 def connect_ch():
     return ETLClickhouseDriver(**settings.ch_settings.dict())
@@ -48,6 +49,9 @@ def run(
                         # try next time
                         if not res:
                             continue
+                        # manuale commit kafka
+                        else:
+                            kafka_consumer.commit()
 
                         batches = []
                         flush_start = time.time()

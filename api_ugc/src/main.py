@@ -1,15 +1,12 @@
-import asyncio
 import logging
 
 import uvicorn
 from api.v1 import ugc_loader
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from storage import kafka
 
 from core.logger import LOGGING
 from core.settings import get_settings
-from services.ugc_kafka_producer import UGCKafkaProducer
 from db.events_storage import get_event_storage, KafkaEventStorage
 
 app = FastAPI(

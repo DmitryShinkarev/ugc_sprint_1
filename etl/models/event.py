@@ -1,10 +1,21 @@
 from typing import Optional
 from uuid import UUID
 
+import orjson
 from pydantic import BaseModel
 
 
-class Payload(BaseModel):
+def orjson_dumps(v, *, default):
+    return orjson.dumps(v, default=default).decode()
+
+
+class BaseETLModel(BaseModel):
+    class Config:
+        json_loads = orjson.loads
+        json_dumps = orjson_dumps
+
+
+class Payload(BaseETLModel):
     movie_id: UUID
     user_id: UUID
     event_data: Optional[str]
@@ -17,7 +28,7 @@ class Payload(BaseModel):
         return result
 
 
-class EventForUGS(BaseModel):
+class EventForUGS(BaseETLModel):
     payload: Payload
     language: Optional[str]
     timezone: Optional[str]

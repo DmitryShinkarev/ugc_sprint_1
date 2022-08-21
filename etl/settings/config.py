@@ -23,6 +23,7 @@ class KafkaSettings(BaseSettings):
     host: list[str] = Field(["localhost:29092"], env="KAFKA_HOST")
     topics: list[str] = Field(["movie_topic"], env="EVENT_TYPES")
     group_id: str = Field("", env="KAFKA_GROUP_ID")
+    enable_auto_commit: bool = Field(False, env="KAFKA_ENABLE_AUTO_COMMIT")
 
 
 class ClickHouseSettings(BaseSettings):
